@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ author.name }} | Authors{% endblock %}
+
+{% block page_title %}{{ author.name }}{% endblock %}
+
+{% block page_subtitle %}
+    <p>Author profile and related books.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'authors:list' %}">Back to Authors</a>
+    <a class="button" href="{% url 'authors:update' author.pk %}">Edit Author</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .author-detail-container {
+            display: grid;
+            gap: 24px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .detail-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 16px;
+            color: var(--text);
+        }
+
+        .bio-content {
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .contact-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: var(--surface-muted);
+            border-radius: 6px;
+        }
+
+        .contact-label {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .contact-value {
+            color: var(--brand);
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .book-list {
+            display: grid;
+            gap: 12px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .book-item {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .book-item:hover {
+            border-color: var(--brand);
+            background: #f8fffe;
+        }
+
+        .book-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 0 0 8px;
+            color: var(--text);
+        }
+
+        .book-meta {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #d9f5ee;
+            color: var(--brand);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .empty-message {
+            color: var(--muted);
+            padding: 20px;
+            text-align: center;
+            background: var(--surface-muted);
+            border-radius: 8px;
+        }
+
+        .danger-section {
+            border-top: 2px solid var(--danger);
+            padding-top: 24px;
+            margin-top: 24px;
+        }
+
+        .danger-link {
+            color: var(--danger);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .danger-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .detail-card {
+                padding: 18px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="author-detail-container">
+        <!-- Bio Section -->
+        <div class="detail-card">
+            <h2>✍️ Biography</h2>
+            {% if author.bio %}
+                <p class="bio-content">{{ author.bio }}</p>
+            {% else %}
+                <p class="empty-message">No biography added.</p>
+            {% endif %}
+        </div>
+
+        <!-- Contact Section -->
+        <div class="detail-card">
+            <h2>📧 Contact Information</h2>
+            {% if author.email %}
+                <div class="contact-item">
+                    <span class="contact-label">Email:</span>
+                    <a class="contact-value" href="mailto:{{ author.email }}">{{ author.email }}</a>
+                </div>
+            {% else %}
+                <p class="empty-message">No email address provided.</p>
+            {% endif %}
+        </div>
+
+        <!-- Books Section -->
+        <div class="detail-card">
+            <h2>📚 Books by this Author</h2>
+            {% if author.books.all %}
+                <ul class="book-list">
+                    {% for book in author.books.all %}
+                        <li class="book-item">
+                            <p class="book-title">{{ book.title }}</p>
+                            <p class="book-meta">
+                                <strong>{{ book.category.name|default:'No category' }}</strong>
+                                <span class="status-badge">{{ book.get_status_display }}</span>
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-message">No books have been assigned to this author yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Delete Section -->
+        <div class="detail-card danger-section">
+            <a class="danger-link" href="{% url 'authors:delete' author.pk %}">🗑️ Delete this author</a>
+        </div>
+    </div>
+{% endblock %}

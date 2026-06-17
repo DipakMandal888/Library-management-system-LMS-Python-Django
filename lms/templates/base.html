@@ -1,0 +1,312 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Library Management System{% endblock %}</title>
+    <style>
+        :root {
+            --bg: #f7f7f2;
+            --surface: #ffffff;
+            --surface-muted: #f0f4f3;
+            --text: #17211f;
+            --muted: #64716e;
+            --border: #d9e1de;
+            --brand: #0f766e;
+            --brand-dark: #115e59;
+            --accent: #b45309;
+            --danger: #be123c;
+            --shadow: 0 14px 40px rgba(23, 33, 31, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.5;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .site-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-inner {
+            align-items: center;
+            display: flex;
+            gap: 24px;
+            justify-content: space-between;
+            margin: 0 auto;
+            max-width: 1180px;
+            padding: 16px 24px;
+        }
+
+        .brand {
+            align-items: center;
+            display: inline-flex;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        .brand-mark {
+            align-items: center;
+            background: var(--brand);
+            border-radius: 6px;
+            color: #ffffff;
+            display: inline-flex;
+            font-size: 0.85rem;
+            height: 34px;
+            justify-content: center;
+            width: 34px;
+        }
+
+        .nav-links {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .nav-links a {
+            border-radius: 6px;
+            color: var(--muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 8px 10px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a:focus {
+            background: var(--surface-muted);
+            color: var(--text);
+        }
+
+        .page {
+            margin: 0 auto;
+            max-width: 1180px;
+            padding: 32px 24px 48px;
+        }
+
+        .page-heading {
+            align-items: flex-start;
+            display: flex;
+            gap: 18px;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-heading h1 {
+            font-size: 2rem;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            margin: 8px 0 0;
+            max-width: 700px;
+        }
+
+        .page-actions {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .button {
+            align-items: center;
+            background: var(--brand);
+            border: 1px solid var(--brand);
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            display: inline-flex;
+            font: inherit;
+            font-weight: 700;
+            justify-content: center;
+            min-height: 40px;
+            padding: 8px 14px;
+        }
+
+        .button:hover,
+        .button:focus {
+            background: var(--brand-dark);
+            border-color: var(--brand-dark);
+        }
+
+        .button.secondary {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .button.secondary:hover,
+        .button.secondary:focus {
+            background: var(--surface-muted);
+        }
+
+        .messages {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .message {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--brand);
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            padding: 12px 14px;
+        }
+
+        .message.error,
+        .message.danger {
+            border-left-color: var(--danger);
+        }
+
+        .message.warning {
+            border-left-color: var(--accent);
+        }
+
+        .content-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .site-footer {
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.9rem;
+            padding: 20px 24px;
+        }
+
+        .footer-inner {
+            align-items: center;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin: 0 auto;
+            max-width: 1180px;
+        }
+
+        @media (max-width: 760px) {
+            .header-inner,
+            .page-heading,
+            .footer-inner {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .header-inner {
+                gap: 14px;
+            }
+
+            .nav-links,
+            .page-actions {
+                justify-content: flex-start;
+            }
+
+            .page {
+                padding: 24px 16px 36px;
+            }
+
+            .content-panel {
+                padding: 18px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% url 'admin:index' as admin_url %}
+    {% url 'books:list' as books_url %}
+    {% url 'authors:list' as authors_url %}
+    {% url 'categories:list' as categories_url %}
+    {% url 'members:list' as members_url %}
+    {% url 'borrow_records:list' as borrow_records_url %}
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="{{ admin_url|default:'/' }}" aria-label="Library Management System home">
+                <span class="brand-mark">LMS</span>
+                <span>Library Management System</span>
+            </a>
+
+            <nav class="nav-links" aria-label="Primary navigation">
+                <a href="{{ books_url|default:'#' }}">Books</a>
+                <a href="{{ authors_url|default:'#' }}">Authors</a>
+                <a href="{{ categories_url|default:'#' }}">Categories</a>
+                <a href="{{ members_url|default:'#' }}">Members</a>
+                <a href="{{ borrow_records_url|default:'#' }}">Borrow Records</a>
+                <a href="{{ admin_url|default:'#' }}">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        {% block page_header %}
+            <section class="page-heading">
+                <div>
+                    <h1>{% block page_title %}Library Dashboard{% endblock %}</h1>
+                    {% block page_subtitle %}
+                        <p>Manage books, authors, categories, members, and borrow records from one place.</p>
+                    {% endblock %}
+                </div>
+                <div class="page-actions">
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </section>
+        {% endblock %}
+
+        {% if messages %}
+            <section class="messages" aria-label="Messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% block content_wrapper %}
+            <section class="content-panel">
+                {% block content %}{% endblock %}
+            </section>
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>&copy; {% now "Y" %} Library Management System</span>
+            {% if user.is_authenticated %}
+                <span>Signed in as {{ user.get_username }}</span>
+            {% endif %}
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

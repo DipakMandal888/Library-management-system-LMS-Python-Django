@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if member.user.get_full_name %}{{ member.user.get_full_name }}{% else %}{{ member.user.username }}{% endif %} | Members
+{% endblock %}
+
+{% block page_title %}
+    {% if member.user.get_full_name %}{{ member.user.get_full_name }}{% else %}{{ member.user.username }}{% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+    <p>{{ member.get_membership_type_display }} member since {{ member.membership_date }}</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'members:list' %}">Back to Members</a>
+    <a class="button" href="{% url 'members:update' member.pk %}">Edit Member</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .member-detail-container {
+            display: grid;
+            gap: 24px;
+            max-width: 900px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            margin: 0;
+            flex: 1;
+        }
+
+        .meta-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .meta-item {
+            display: grid;
+            gap: 4px;
+        }
+
+        .meta-item span {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .meta-item strong {
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .status-active {
+            background: #d9f5ee;
+            color: #0f766e;
+        }
+
+        .status-inactive {
+            background: #ffe4e6;
+            color: var(--danger);
+        }
+
+        .record-list {
+            display: grid;
+            gap: 12px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .record-list li {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .record-list li strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .muted {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .danger-section {
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .danger-link {
+            color: var(--danger);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .danger-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="member-detail-container">
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>👤 Member Details</h2>
+                <span class="status-badge {% if member.is_active %}status-active{% else %}status-inactive{% endif %}">
+                    {% if member.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span>Member ID</span>
+                    <strong style="font-family: 'Courier New', monospace; color: var(--accent);">{{ member.get_unique_id }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Username</span>
+                    <strong>{{ member.user.username }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Email</span>
+                    <strong>{{ member.user.email|default:'Not provided' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Phone</span>
+                    <strong>{{ member.phone|default:'Not provided' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Membership Type</span>
+                    <strong>{{ member.get_membership_type_display }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Member Since</span>
+                    <strong>{{ member.membership_date }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Active Borrows</span>
+                    <strong>{{ member.active_borrows }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>📍 Address</h2>
+            </div>
+            {% if member.address %}
+                <p>{{ member.address }}</p>
+            {% else %}
+                <p class="muted">No address added.</p>
+            {% endif %}
+        </div>
+
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>📚 Borrow Records</h2>
+            </div>
+            {% if borrow_records %}
+                <ul class="record-list">
+                    {% for record in borrow_records %}
+                        <li>
+                            <div>
+                                <strong>{{ record.book.title }}</strong>
+                                <p class="muted">Borrowed {{ record.borrow_date }} | Due {{ record.due_date }}</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No borrow records for this member yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="danger-section">
+            <a class="danger-link" href="{% url 'members:delete' member.pk %}">🗑️ Delete this member</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories | Library Management System{% endblock %}
+
+{% block page_title %}Categories{% endblock %}
+
+{% block page_subtitle %}
+    <p>Organize the library collection by subject, genre, or shelf section.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button" href="{% url 'categories:create' %}">+ Add Category</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .list-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-muted) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .category-count {
+            background: var(--brand);
+            color: #ffffff;
+            border: none;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .category-table-wrap {
+            overflow-x: auto;
+        }
+
+        .category-table {
+            border-collapse: collapse;
+            min-width: 620px;
+            width: 100%;
+        }
+
+        .category-table th {
+            background: var(--surface-muted);
+            border-bottom: 2px solid var(--border);
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .category-table td {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+        .category-table tr:hover {
+            background: #f8fffe;
+        }
+
+        .category-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .category-name {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .category-description {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .row-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.view {
+            color: var(--brand);
+            background: transparent;
+        }
+
+        .action-btn.view:hover {
+            background: #d9f5ee;
+        }
+
+        .action-btn.edit {
+            color: var(--accent);
+            background: transparent;
+        }
+
+        .action-btn.edit:hover {
+            background: #fef3c7;
+        }
+
+        .action-btn.delete {
+            color: var(--danger);
+            background: transparent;
+        }
+
+        .action-btn.delete:hover {
+            background: #ffe4e6;
+        }
+
+        .empty-state {
+            background: var(--surface-muted);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .empty-state h2 {
+            font-size: 1.3rem;
+            margin: 0 0 8px;
+            color: var(--text);
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+        @media (max-width: 640px) {
+            .list-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if categories %}
+        <div class="list-container">
+            <div class="list-header">
+                <h3>🏷️ Category Directory</h3>
+                <span class="category-count">{{ categories|length }} total</span>
+            </div>
+
+            <div class="category-table-wrap">
+                <table class="category-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Books</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td class="category-name">
+                                    <a class="action-btn view" href="{% url 'categories:detail' category.pk %}">
+                                        {{ category.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if category.description %}
+                                        <p class="category-description">{{ category.description|truncatewords:15 }}</p>
+                                    {% else %}
+                                        <p class="category-description">No description added.</p>
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ category.books.count }}</strong></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="action-btn view" href="{% url 'categories:detail' category.pk %}">View</a>
+                                        <a class="action-btn edit" href="{% url 'categories:update' category.pk %}">Edit</a>
+                                        <a class="action-btn delete" href="{% url 'categories:delete' category.pk %}">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>📚 No categories yet</h2>
+            <p>Create categories to make books easier to browse and manage.</p>
+            <a class="button" href="{% url 'categories:create' %}">+ Add Category</a>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} | Books{% endblock %}
+
+{% block page_title %}{{ book.title }}{% endblock %}
+
+{% block page_subtitle %}
+    <p>{{ book.author.name }} | ISBN {{ book.isbn }}</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'books:list' %}">Back to Books</a>
+    <a class="button" href="{% url 'books:update' book.pk %}">Edit Book</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .book-detail {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: minmax(200px, 300px) 1fr;
+        }
+
+        .cover-box {
+            align-items: center;
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            min-height: 340px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .cover-box img {
+            display: block;
+            height: 100%;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .cover-placeholder {
+            color: var(--muted);
+            font-weight: 700;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .detail-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .detail-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 16px;
+            color: var(--text);
+        }
+
+        .meta-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        }
+
+        .meta-item {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .meta-item span {
+            color: var(--muted);
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .meta-item-value {
+            color: var(--text);
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .description-text {
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .muted {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            background: #d9f5ee;
+            color: var(--brand);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .danger-link {
+            color: var(--danger);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .danger-link:hover {
+            text-decoration: underline;
+        }
+
+        .danger-section {
+            border-top: 2px solid var(--danger);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 760px) {
+            .book-detail {
+                grid-template-columns: 1fr;
+            }
+
+            .cover-box {
+                min-height: 280px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="book-detail">
+        <aside class="cover-box">
+            {% if book.cover_image %}
+                <img src="{{ book.cover_image.url }}" alt="{{ book.title }} cover">
+            {% else %}
+                <div class="cover-placeholder">📖<br>No cover image</div>
+            {% endif %}
+        </aside>
+
+        <div class="detail-grid">
+            <!-- Description -->
+            <div class="detail-card">
+                <h2>📝 Description</h2>
+                {% if book.description %}
+                    <p class="description-text">{{ book.description }}</p>
+                {% else %}
+                    <p class="muted">No description added.</p>
+                {% endif %}
+            </div>
+
+            <!-- Details -->
+            <div class="detail-card">
+                <h2>📚 Details</h2>
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <span>Author</span>
+                        <div class="meta-item-value">{{ book.author.name }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <span>Category</span>
+                        <div class="meta-item-value">{{ book.category.name|default:'No category' }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <span>Published</span>
+                        <div class="meta-item-value">{{ book.published_date }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <span>Status</span>
+                        <div class="meta-item-value"><span class="status-badge">{{ book.get_status_display }}</span></div>
+                    </div>
+                    <div class="meta-item">
+                        <span>Copies</span>
+                        <div class="meta-item-value">{{ book.available_copies }} / {{ book.total_copies }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <span>ISBN</span>
+                        <div class="meta-item-value">{{ book.isbn }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Section -->
+            <div class="detail-card danger-section">
+                <a class="danger-link" href="{% url 'books:delete' book.pk %}">🗑️ Delete this book</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

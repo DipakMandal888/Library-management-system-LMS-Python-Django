@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form_title }} | Books{% endblock %}
+
+{% block page_title %}{{ form_title }}{% endblock %}
+
+{% block page_subtitle %}
+    <p>Enter catalog information, inventory counts, and availability details.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'books:list' %}">Back to Books</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 28px;
+            max-width: 840px;
+        }
+
+        .book-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .form-field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font: inherit;
+            padding: 11px 12px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .form-field input:hover,
+        .form-field select:hover,
+        .form-field textarea:hover {
+            border-color: #b5d9d5;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            border-color: var(--brand);
+            outline: 3px solid rgba(15, 118, 110, 0.16);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+
+        .form-field textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .help-text {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .field-errors,
+        .form-errors {
+            color: var(--danger);
+            font-weight: 700;
+            margin: 0;
+            font-size: 0.9rem;
+            background: #ffe4e6;
+            padding: 8px 10px;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .form-actions .button {
+            min-width: 120px;
+        }
+
+        @media (max-width: 760px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="form-card">
+        <form class="book-form" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                    <div class="form-field {% if field.name == 'description' or field.name == 'cover_image' %}full{% endif %}">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <span class="help-text">{{ field.help_text }}</span>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button class="button" type="submit">{{ submit_label }}</button>
+                <a class="button secondary" href="{% url 'books:list' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

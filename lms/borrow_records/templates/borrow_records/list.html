@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}Borrow Records | Library Management System{% endblock %}
+
+{% block page_title %}Borrow Records{% endblock %}
+
+{% block page_subtitle %}
+    <p>Track borrowed books, due dates, returns, and fines.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button" href="{% url 'borrow_records:create' %}">Add Borrow Record</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .list-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-header {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .list-header h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .record-count {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 6px;
+            color: white;
+            font-weight: 700;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+        }
+
+        .search-container {
+            padding: 16px 24px;
+            background: var(--surface-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--surface);
+            transition: all 0.2s ease;
+        }
+
+        .search-input:hover {
+            border-color: #b5d9d5;
+        }
+
+        .search-input:focus {
+            border-color: var(--brand);
+            outline: 3px solid rgba(15, 118, 110, 0.16);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+
+        .search-btn {
+            background: var(--brand);
+            border: 1px solid var(--brand);
+            border-radius: 6px;
+            color: white;
+            font-weight: 700;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .search-btn:hover,
+        .search-btn:focus {
+            background: var(--brand-dark);
+            box-shadow: 0 4px 8px rgba(15, 118, 110, 0.2);
+        }
+
+        .clear-search {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-weight: 700;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        .clear-search:hover {
+            background: var(--surface-muted);
+            border-color: var(--muted);
+        }
+
+        .record-table-wrap {
+            overflow-x: auto;
+        }
+
+        .record-table {
+            border-collapse: collapse;
+            min-width: 1020px;
+            width: 100%;
+        }
+
+        .record-table th,
+        .record-table td {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .record-table th {
+            background: var(--surface-muted);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .record-table tbody tr:hover {
+            background: var(--surface-muted);
+        }
+
+        .record-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .record-id {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .status-pill {
+            border-radius: 999px;
+            display: inline-flex;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 4px 10px;
+        }
+
+        .status-active {
+            background: #d9f5ee;
+            color: #0f766e;
+        }
+
+        .status-overdue {
+            background: #ffe4e6;
+            color: var(--danger);
+        }
+
+        .status-returned {
+            background: #e6edf2;
+            color: #475569;
+        }
+
+        .action-btn {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.view {
+            background: var(--brand);
+        }
+
+        .action-btn.view:hover,
+        .action-btn.view:focus {
+            background: var(--brand-dark);
+            box-shadow: 0 4px 8px rgba(15, 118, 110, 0.2);
+        }
+
+        .action-btn.edit {
+            background: var(--accent);
+        }
+
+        .action-btn.edit:hover,
+        .action-btn.edit:focus {
+            background: #a03d0a;
+            box-shadow: 0 4px 8px rgba(180, 83, 9, 0.2);
+        }
+
+        .action-btn.delete {
+            background: var(--danger);
+        }
+
+        .action-btn.delete:hover,
+        .action-btn.delete:focus {
+            background: #9f1239;
+            box-shadow: 0 4px 8px rgba(190, 18, 60, 0.2);
+        }
+
+        .row-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .empty-state {
+            background: var(--surface-muted);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 32px 24px;
+            text-align: center;
+            margin: 0;
+        }
+
+        .empty-state h2 {
+            font-size: 1.25rem;
+            margin: 0 0 8px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            margin: 0 0 16px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if borrow_records %}
+        <div class="list-container">
+            <div class="list-header">
+                <h2>📚 Borrow History</h2>
+                <span class="record-count">{{ borrow_records|length }} records</span>
+            </div>
+
+            <div class="search-container">
+                <form class="search-form" method="get">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="🔍 Search by member name or book title..." 
+                        class="search-input"
+                        value="{{ search_query }}"
+                    >
+                    <button type="submit" class="search-btn">Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'borrow_records:list' %}" class="clear-search">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <div class="record-table-wrap">
+                <table class="record-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Record ID</th>
+                            <th scope="col">Book</th>
+                            <th scope="col">Member</th>
+                            <th scope="col">Borrowed</th>
+                            <th scope="col">Due</th>
+                            <th scope="col">Returned</th>
+                            <th scope="col">Fine</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in borrow_records %}
+                            <tr>
+                                <td class="record-id">{{ record.get_unique_id }}</td>
+                                <td>
+                                    <a class="action-btn view" href="{% url 'borrow_records:detail' record.pk %}">
+                                        {{ record.book.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if record.member.user.get_full_name %}
+                                        {{ record.member.user.get_full_name }}
+                                    {% else %}
+                                        {{ record.member.user.username }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ record.borrow_date }}</td>
+                                <td>{{ record.due_date }}</td>
+                                <td>{{ record.return_date|default:'Not returned' }}</td>
+                                <td>Rs. {{ record.fine_amount }}</td>
+                                <td>
+                                    {% if record.return_date %}
+                                        <span class="status-pill status-returned">Returned</span>
+                                    {% elif record.is_overdue %}
+                                        <span class="status-pill status-overdue">Overdue</span>
+                                    {% else %}
+                                        <span class="status-pill status-active">Active</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="action-btn edit" href="{% url 'borrow_records:update' record.pk %}">Edit</a>
+                                        <a class="action-btn delete" href="{% url 'borrow_records:delete' record.pk %}">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>{% if search_query %}No borrow records found{% else %}No borrow records yet{% endif %}</h2>
+            <p>{% if search_query %}Try adjusting your search criteria.{% else %}Create a borrow record after adding members and books.{% endif %}</p>
+            <a class="button" href="{% url 'borrow_records:create' %}">Add Borrow Record</a>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Borrow Record | Library Management System{% endblock %}
+
+{% block page_title %}Borrow Record{% endblock %}
+
+{% block page_subtitle %}
+    <p>{{ borrow_record.book.title }} borrowed by {% if borrow_record.member.user.get_full_name %}{{ borrow_record.member.user.get_full_name }}{% else %}{{ borrow_record.member.user.username }}{% endif %}</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'borrow_records:list' %}">Back to Records</a>
+    <a class="button" href="{% url 'borrow_records:update' borrow_record.pk %}">Edit Record</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .record-detail-container {
+            display: grid;
+            gap: 24px;
+            max-width: 900px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            margin: 0;
+            flex: 1;
+        }
+
+        .meta-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .meta-item {
+            display: grid;
+            gap: 4px;
+        }
+
+        .meta-item span {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .meta-item strong {
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .status-active {
+            background: #d9f5ee;
+            color: #0f766e;
+        }
+
+        .status-overdue {
+            background: #ffe4e6;
+            color: var(--danger);
+        }
+
+        .status-returned {
+            background: #e6edf2;
+            color: #475569;
+        }
+
+        .muted {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .danger-section {
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .danger-link {
+            color: var(--danger);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .danger-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="record-detail-container">
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>📋 Record Details</h2>
+                {% if borrow_record.return_date %}
+                    <span class="status-badge status-returned">Returned</span>
+                {% elif borrow_record.is_overdue %}
+                    <span class="status-badge status-overdue">Overdue</span>
+                {% else %}
+                    <span class="status-badge status-active">Active</span>
+                {% endif %}
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span>Record ID</span>
+                    <strong style="font-family: 'Courier New', monospace; color: var(--accent);">{{ borrow_record.get_unique_id }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Book</span>
+                    <strong>{{ borrow_record.book.title }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Author</span>
+                    <strong>{{ borrow_record.book.author.name }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Member</span>
+                    <strong>
+                        {% if borrow_record.member.user.get_full_name %}
+                            {{ borrow_record.member.user.get_full_name }}
+                        {% else %}
+                            {{ borrow_record.member.user.username }}
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="meta-item">
+                    <span>Borrow Date</span>
+                    <strong>{{ borrow_record.borrow_date }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Due Date</span>
+                    <strong>{{ borrow_record.due_date }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Return Date</span>
+                    <strong>{{ borrow_record.return_date|default:'Not returned' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Stored Fine</span>
+                    <strong>Rs. {{ borrow_record.fine_amount }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span>Calculated Fine</span>
+                    <strong>Rs. {{ borrow_record.calculate_fine }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>📝 Notes</h2>
+            </div>
+            {% if borrow_record.notes %}
+                <p>{{ borrow_record.notes }}</p>
+            {% else %}
+                <p class="muted">No notes added.</p>
+            {% endif %}
+        </div>
+
+        <div class="danger-section">
+            <a class="danger-link" href="{% url 'borrow_records:delete' borrow_record.pk %}">🗑️ Delete this record</a>
+        </div>
+    </div>
+{% endblock %}

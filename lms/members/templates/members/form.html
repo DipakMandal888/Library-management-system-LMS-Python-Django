@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form_title }} | Members{% endblock %}
+
+{% block page_title %}{{ form_title }}{% endblock %}
+
+{% block page_subtitle %}
+    <p>Connect a Django user account to a library membership profile.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'members:list' %}">Back to Members</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 28px;
+            max-width: 760px;
+        }
+
+        .member-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .form-field label {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font: inherit;
+            padding: 11px 12px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .form-field input:hover,
+        .form-field select:hover,
+        .form-field textarea:hover {
+            border-color: #b5d9d5;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            border-color: var(--brand);
+            outline: 3px solid rgba(15, 118, 110, 0.16);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+
+        .form-field input[type="checkbox"] {
+            height: 18px;
+            width: 18px;
+        }
+
+        .field-errors,
+        .form-errors {
+            color: var(--danger);
+            font-weight: 700;
+            margin: 0;
+            font-size: 0.9rem;
+            background: #ffe4e6;
+            padding: 8px 10px;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .form-actions .button {
+            min-width: 120px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="form-card">
+        <form class="member-form" method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-errors">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button class="button" type="submit">{{ submit_label }}</button>
+                <a class="button secondary" href="{% url 'members:list' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

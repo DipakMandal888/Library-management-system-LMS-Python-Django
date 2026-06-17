@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome | Library Management System{% endblock %}
+
+{% block page_header %}{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+            border-radius: 12px;
+            color: #ffffff;
+            margin: -32px -24px 32px -24px;
+            padding: 64px 24px;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin: 0 0 16px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin: 0 0 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .hero-actions .button {
+            background: #ffffff;
+            color: var(--brand);
+            font-weight: 700;
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+
+        .hero-actions .button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-actions .button.secondary {
+            background: transparent;
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .hero-actions .button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Feature Cards Grid */
+        .features-section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 28px;
+            color: var(--text);
+        }
+
+        .features-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            margin-bottom: 32px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 28px 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-card:hover {
+            border-color: var(--brand);
+            box-shadow: 0 12px 32px rgba(15, 118, 110, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 2.4rem;
+            height: 50px;
+            width: 50px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            color: #ffffff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        .feature-card .button {
+            align-self: center;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-muted) 100%);
+            border-radius: 10px;
+            padding: 32px 24px;
+            margin-bottom: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--brand);
+            margin: 0 0 8px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Quick Actions */
+        .quick-actions-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px;
+        }
+
+        .quick-actions-section h3 {
+            margin: 0 0 20px;
+            font-size: 1.3rem;
+            color: var(--text);
+        }
+
+        .quick-actions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .quick-action-btn {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 10px 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--brand);
+            color: #ffffff;
+            border-color: var(--brand);
+        }
+
+        @media (max-width: 760px) {
+            .hero-section {
+                margin: -24px -16px 24px -16px;
+                padding: 40px 16px;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 1.6rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions-list {
+                flex-direction: column;
+            }
+
+            .quick-action-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content_wrapper %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>📚 Welcome to Nihareeka College 📚</h1>
+            <h2>Nihareeka E-Library For Students</h2>
+            <p>Your comprehensive Library Management System for managing books, authors, categories, members, and borrow records all in one place.</p>
+            <div class="hero-actions">
+                <a class="button" href="{% url 'books:list' %}">Browse Books</a>
+                <a class="button secondary" href="{% url 'members:list' %}">View Members</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2 class="section-title">Quick Access Modules</h2>
+        <div class="features-grid">
+            <!-- Books Card -->
+            <a href="{% url 'books:list' %}" class="feature-card">
+                <div class="feature-icon">📖</div>
+                <h3>Books</h3>
+                <p>Manage your library collection. Add, edit, and view all books with their details.</p>
+                <span class="button secondary" style="background: none; border: none; color: var(--brand); padding: 0;">View Books →</span>
+            </a>
+
+            <!-- Authors Card -->
+            <a href="{% url 'authors:list' %}" class="feature-card">
+                <div class="feature-icon">✍️</div>
+                <h3>Authors</h3>
+                <p>Manage author information. Track authors and their published books.</p>
+                <span class="button secondary" style="background: none; border: none; color: var(--brand); padding: 0;">View Authors →</span>
+            </a>
+
+            <!-- Categories Card -->
+            <a href="{% url 'categories:list' %}" class="feature-card">
+                <div class="feature-icon">🏷️</div>
+                <h3>Categories</h3>
+                <p>Organize books by category. Create and manage different book categories.</p>
+                <span class="button secondary" style="background: none; border: none; color: var(--brand); padding: 0;">View Categories →</span>
+            </a>
+
+            <!-- Members Card -->
+            <a href="{% url 'members:list' %}" class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Members</h3>
+                <p>Manage library members. Add new members and track their information.</p>
+                <span class="button secondary" style="background: none; border: none; color: var(--brand); padding: 0;">View Members →</span>
+            </a>
+
+            <!-- Borrow Records Card -->
+            <a href="{% url 'borrow_records:list' %}" class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Borrow Records</h3>
+                <p>Track book borrowing. Monitor due dates and manage circulation history.</p>
+                <span class="button secondary" style="background: none; border: none; color: var(--brand); padding: 0;">View Records →</span>
+            </a>
+
+            <!-- Admin Card -->
+            <a href="{% url 'admin:index' %}" class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>Admin Panel</h3>
+                <p>System administration. Access advanced settings and user management.</p>
+                <span class="button secondary" style="background: none; border: none; color: var(--brand); padding: 0;">Go to Admin →</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Stats Section (Optional - can be replaced with real data from views) -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">📚</div>
+                <p class="stat-label">Books in Library</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">✍️</div>
+                <p class="stat-label">Authors</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">👥</div>
+                <p class="stat-label">Active Members</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">📋</div>
+                <p class="stat-label">Borrow Records</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions-section">
+        <h3>Quick Actions</h3>
+        <div class="quick-actions-list">
+            <a href="{% url 'books:list' %}" class="quick-action-btn">+ Add Book</a>
+            <a href="{% url 'authors:list' %}" class="quick-action-btn">+ Add Author</a>
+            <a href="{% url 'members:list' %}" class="quick-action-btn">+ Add Member</a>
+            <a href="{% url 'borrow_records:list' %}" class="quick-action-btn">+ New Borrow Record</a>
+            <a href="{% url 'categories:list' %}" class="quick-action-btn">+ Add Category</a>
+        </div>
+    </section>
+{% endblock %}

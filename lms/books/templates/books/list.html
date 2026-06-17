@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Books | Library Management System{% endblock %}
+
+{% block page_title %}Books{% endblock %}
+
+{% block page_subtitle %}
+    <p>Manage the catalog, copy counts, and availability status for every book.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button" href="{% url 'books:create' %}">+ Add Book</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .list-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-muted) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .book-count {
+            background: var(--brand);
+            color: #ffffff;
+            border: none;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .book-table-wrap {
+            overflow-x: auto;
+        }
+
+        .book-table {
+            border-collapse: collapse;
+            min-width: 900px;
+            width: 100%;
+        }
+
+        .book-table th {
+            background: var(--surface-muted);
+            border-bottom: 2px solid var(--border);
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .book-table td {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+        .book-table tr:hover {
+            background: #f8fffe;
+        }
+
+        .book-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .book-title {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .muted {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .status-pill {
+            border-radius: 6px;
+            display: inline-flex;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 10px;
+        }
+
+        .status-available {
+            background: #d9f5ee;
+            color: #0f766e;
+        }
+
+        .status-borrowed {
+            background: #fff3d6;
+            color: #92400e;
+        }
+
+        .status-lost {
+            background: #ffe4e6;
+            color: var(--danger);
+        }
+
+        .row-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.view {
+            color: var(--brand);
+            background: transparent;
+        }
+
+        .action-btn.view:hover {
+            background: #d9f5ee;
+        }
+
+        .action-btn.edit {
+            color: var(--accent);
+            background: transparent;
+        }
+
+        .action-btn.edit:hover {
+            background: #fef3c7;
+        }
+
+        .action-btn.delete {
+            color: var(--danger);
+            background: transparent;
+        }
+
+        .action-btn.delete:hover {
+            background: #ffe4e6;
+        }
+
+        .empty-state {
+            background: var(--surface-muted);
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .empty-state h2 {
+            font-size: 1.3rem;
+            margin: 0 0 8px;
+            color: var(--text);
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+        @media (max-width: 640px) {
+            .list-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .book-table {
+                min-width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if books %}
+        <div class="list-container">
+            <div class="list-header">
+                <h3>📚 Book Catalog</h3>
+                <span class="book-count">{{ books|length }} total</span>
+            </div>
+
+            <div class="book-table-wrap">
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Author</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">ISBN</th>
+                            <th scope="col">Copies</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                            <tr>
+                                <td class="book-title">
+                                    <a class="action-btn view" href="{% url 'books:detail' book.pk %}">
+                                        {{ book.title }}
+                                    </a>
+                                </td>
+                                <td>{{ book.author.name }}</td>
+                                <td>{{ book.category.name|default:'No category' }}</td>
+                                <td><strong>{{ book.isbn }}</strong></td>
+                                <td><strong>{{ book.available_copies }}/{{ book.total_copies }}</strong></td>
+                                <td>
+                                    <span class="status-pill status-{{ book.status }}">
+                                        {{ book.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="action-btn view" href="{% url 'books:detail' book.pk %}">View</a>
+                                        <a class="action-btn edit" href="{% url 'books:update' book.pk %}">Edit</a>
+                                        <a class="action-btn delete" href="{% url 'books:delete' book.pk %}">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>📚 No books yet</h2>
+            <p>Add books after creating at least one author.</p>
+            <a class="button" href="{% url 'books:create' %}">+ Add Book</a>
+        </div>
+    {% endif %}
+{% endblock %}

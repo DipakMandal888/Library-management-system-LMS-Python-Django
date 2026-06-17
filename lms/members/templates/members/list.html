@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}Members | Library Management System{% endblock %}
+
+{% block page_title %}Members{% endblock %}
+
+{% block page_subtitle %}
+    <p>Manage library members, membership types, contact details, and active borrowing status.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button" href="{% url 'members:create' %}">Add Member</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .list-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-header {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .list-header h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .member-count {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 6px;
+            color: white;
+            font-weight: 700;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+        }
+
+        .search-container {
+            padding: 16px 24px;
+            background: var(--surface-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--surface);
+            transition: all 0.2s ease;
+        }
+
+        .search-input:hover {
+            border-color: #b5d9d5;
+        }
+
+        .search-input:focus {
+            border-color: var(--brand);
+            outline: 3px solid rgba(15, 118, 110, 0.16);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+
+        .search-btn {
+            background: var(--brand);
+            border: 1px solid var(--brand);
+            border-radius: 6px;
+            color: white;
+            font-weight: 700;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .search-btn:hover,
+        .search-btn:focus {
+            background: var(--brand-dark);
+            box-shadow: 0 4px 8px rgba(15, 118, 110, 0.2);
+        }
+
+        .clear-search {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-weight: 700;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        .clear-search:hover {
+            background: var(--surface-muted);
+            border-color: var(--muted);
+        }
+
+        .member-table-wrap {
+            overflow-x: auto;
+        }
+
+        .member-table {
+            border-collapse: collapse;
+            min-width: 920px;
+            width: 100%;
+        }
+
+        .member-table th,
+        .member-table td {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .member-table th {
+            background: var(--surface-muted);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .member-table tbody tr:hover {
+            background: var(--surface-muted);
+        }
+
+        .member-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .member-id {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .member-name {
+            font-weight: 700;
+            color: var(--brand);
+        }
+
+        .muted {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .status-pill {
+            border-radius: 999px;
+            display: inline-flex;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 4px 10px;
+        }
+
+        .status-active {
+            background: #d9f5ee;
+            color: #0f766e;
+        }
+
+        .status-inactive {
+            background: #ffe4e6;
+            color: var(--danger);
+        }
+
+        .action-btn {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.view {
+            background: var(--brand);
+        }
+
+        .action-btn.view:hover,
+        .action-btn.view:focus {
+            background: var(--brand-dark);
+            box-shadow: 0 4px 8px rgba(15, 118, 110, 0.2);
+        }
+
+        .action-btn.edit {
+            background: var(--accent);
+        }
+
+        .action-btn.edit:hover,
+        .action-btn.edit:focus {
+            background: #a03d0a;
+            box-shadow: 0 4px 8px rgba(180, 83, 9, 0.2);
+        }
+
+        .action-btn.delete {
+            background: var(--danger);
+        }
+
+        .action-btn.delete:hover,
+        .action-btn.delete:focus {
+            background: #9f1239;
+            box-shadow: 0 4px 8px rgba(190, 18, 60, 0.2);
+        }
+
+        .row-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .empty-state {
+            background: var(--surface-muted);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 32px 24px;
+            text-align: center;
+            margin: 0;
+        }
+
+        .empty-state h2 {
+            font-size: 1.25rem;
+            margin: 0 0 8px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            margin: 0 0 16px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if members %}
+        <div class="list-container">
+            <div class="list-header">
+                <h2>👥 Member Directory</h2>
+                <span class="member-count">{{ members|length }} members</span>
+            </div>
+
+            <div class="search-container">
+                <form class="search-form" method="get">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="🔍 Search by name, username, or phone..." 
+                        class="search-input"
+                        value="{{ search_query }}"
+                    >
+                    <button type="submit" class="search-btn">Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'members:list' %}" class="clear-search">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <div class="member-table-wrap">
+                <table class="member-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Member ID</th>
+                            <th scope="col">Member</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Phone</th>
+                            <th scope="col">Active Borrows</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                            <tr>
+                                <td class="member-id">{{ member.get_unique_id }}</td>
+                                <td class="member-name">
+                                    <a class="action-btn view" href="{% url 'members:detail' member.pk %}">
+                                        {% if member.user.get_full_name %}
+                                            {{ member.user.get_full_name }}
+                                        {% else %}
+                                            {{ member.user.username }}
+                                        {% endif %}
+                                    </a>
+                                </td>
+                                <td>{{ member.user.username }}</td>
+                                <td>{{ member.get_membership_type_display }}</td>
+                                <td>{{ member.phone|default:'Not provided' }}</td>
+                                <td>{{ member.active_borrows }}</td>
+                                <td>
+                                    {% if member.is_active %}
+                                        <span class="status-pill status-active">Active</span>
+                                    {% else %}
+                                        <span class="status-pill status-inactive">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="action-btn edit" href="{% url 'members:update' member.pk %}">Edit</a>
+                                        <a class="action-btn delete" href="{% url 'members:delete' member.pk %}">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>{% if search_query %}No members found{% else %}No members yet{% endif %}</h2>
+            <p>{% if search_query %}Try adjusting your search criteria.{% else %}Create a user first, then add a member profile for borrowing.{% endif %}</p>
+            <a class="button" href="{% url 'members:create' %}">Add Member</a>
+        </div>
+    {% endif %}
+{% endblock %}

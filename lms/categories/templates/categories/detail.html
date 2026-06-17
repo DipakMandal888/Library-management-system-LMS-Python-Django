@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} | Categories{% endblock %}
+
+{% block page_title %}{{ category.name }}{% endblock %}
+
+{% block page_subtitle %}
+    <p>Category details and related books.</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'categories:list' %}">Back to Categories</a>
+    <a class="button" href="{% url 'categories:update' category.pk %}">Edit Category</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .category-detail-container {
+            display: grid;
+            gap: 24px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .detail-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 16px;
+            color: var(--text);
+        }
+
+        .description-text {
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .book-list {
+            display: grid;
+            gap: 12px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .book-item {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .book-item:hover {
+            border-color: var(--brand);
+            background: #f8fffe;
+        }
+
+        .book-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 0 0 8px;
+            color: var(--text);
+        }
+
+        .book-meta {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #d9f5ee;
+            color: var(--brand);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .empty-message {
+            color: var(--muted);
+            padding: 20px;
+            text-align: center;
+            background: var(--surface-muted);
+            border-radius: 8px;
+        }
+
+        .danger-section {
+            border-top: 2px solid var(--danger);
+            padding-top: 24px;
+            margin-top: 24px;
+        }
+
+        .danger-link {
+            color: var(--danger);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .danger-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .detail-card {
+                padding: 18px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="category-detail-container">
+        <!-- Description -->
+        <div class="detail-card">
+            <h2>📝 Description</h2>
+            {% if category.description %}
+                <p class="description-text">{{ category.description }}</p>
+            {% else %}
+                <p class="empty-message">No description added.</p>
+            {% endif %}
+        </div>
+
+        <!-- Books -->
+        <div class="detail-card">
+            <h2>📚 Books in this Category</h2>
+            {% if category.books.all %}
+                <ul class="book-list">
+                    {% for book in category.books.all %}
+                        <li class="book-item">
+                            <p class="book-title">{{ book.title }}</p>
+                            <p class="book-meta">
+                                <strong>{{ book.author.name }}</strong>
+                                <span class="status-badge">{{ book.get_status_display }}</span>
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-message">No books have been assigned to this category yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Delete -->
+        <div class="detail-card danger-section">
+            <a class="danger-link" href="{% url 'categories:delete' category.pk %}">🗑️ Delete this category</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Borrow Record | Borrow Records{% endblock %}
+
+{% block page_title %}Delete Borrow Record{% endblock %}
+
+{% block page_subtitle %}
+    <p>Confirm removal for "{{ borrow_record.book.title }}".</p>
+{% endblock %}
+
+{% block page_actions %}
+    <a class="button secondary" href="{% url 'borrow_records:detail' borrow_record.pk %}">Back to Record</a>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .delete-card {
+            background: var(--surface);
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(190, 18, 60, 0.1);
+            padding: 28px;
+            max-width: 540px;
+        }
+
+        .delete-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .delete-icon {
+            font-size: 1.8rem;
+        }
+
+        .delete-card h2 {
+            color: var(--danger);
+            font-size: 1.3rem;
+            margin: 0 0 8px;
+        }
+
+        .delete-card p {
+            color: var(--muted);
+            margin: 0 0 12px;
+            line-height: 1.5;
+        }
+
+        .delete-warning {
+            background: #ffe4e6;
+            border: 1px solid #fbb3b7;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            color: #be123c;
+        }
+
+        .delete-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .button.danger {
+            background: var(--danger);
+            border-color: var(--danger);
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .button.danger:hover,
+        .button.danger:focus {
+            background: #9f1239;
+            border-color: #9f1239;
+            box-shadow: 0 4px 12px rgba(190, 18, 60, 0.3);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="delete-card">
+        <div class="delete-header">
+            <span class="delete-icon">⚠️</span>
+            <div>
+                <h2>Delete Record?</h2>
+            </div>
+        </div>
+        
+        <p>Delete the borrow record for <strong>{{ borrow_record.book.title }}</strong> borrowed by
+        {% if borrow_record.member.user.get_full_name %}<strong>{{ borrow_record.member.user.get_full_name }}</strong>{% else %}<strong>{{ borrow_record.member.user.username }}</strong>{% endif %}?</p>
+        
+        <div class="delete-warning">
+            <strong>Note:</strong> The member and book records will remain unchanged. Only this borrow record will be removed.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button class="button danger" type="submit">Delete Record</button>
+                <a class="button secondary" href="{% url 'borrow_records:detail' borrow_record.pk %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
