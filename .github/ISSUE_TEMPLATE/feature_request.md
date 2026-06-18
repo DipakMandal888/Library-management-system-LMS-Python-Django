@@ -1,9 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+title: Library Management System (LMS)
+labels: enhancement, good first issue, help wanted
+assignees: DipakMandal888
 
 ---
 
